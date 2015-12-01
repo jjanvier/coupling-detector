@@ -2,6 +2,7 @@
 
 namespace spec\Akeneo\CouplingDetector;
 
+use Akeneo\CouplingDetector\Domain\ExclusionInterface;
 use Akeneo\CouplingDetector\Domain\NodeInterface;
 use Akeneo\CouplingDetector\Domain\RuleInterface;
 use Akeneo\CouplingDetector\Domain\ViolationInterface;
@@ -26,6 +27,8 @@ class RuleCheckerSpec extends ObjectBehavior
         $rule->getSubject()->willReturn('foo\bar');
         $rule->getRequirements()->willReturn(['blu', 'bla', 'bli']);
         $rule->getType()->willReturn(RuleInterface::TYPE_FORBIDDEN);
+        $rule->getExclusions()->willReturn([]);
+
         $node->getSubject()->willReturn('foo\bar\baz');
         $node->getTokens()->willReturn(['blo', 'bly']);
 
@@ -40,6 +43,8 @@ class RuleCheckerSpec extends ObjectBehavior
         $rule->getSubject()->willReturn('foo\bar');
         $rule->getRequirements()->willReturn(['blu', 'bla', 'bli']);
         $rule->getType()->willReturn(RuleInterface::TYPE_FORBIDDEN);
+        $rule->getExclusions()->willReturn([]);
+
         $node->getSubject()->willReturn('foo\bar\baz');
         $node->getTokens()->willReturn(['blu', 'bla', 'blo', 'bly']);
 
@@ -51,11 +56,37 @@ class RuleCheckerSpec extends ObjectBehavior
         $this->check($rule, $node)->shouldBeLikeExpectedViolation($violation);
     }
 
+    function it_checks_an_invalid_node_with_forbidden_rule_and_exclusions(
+        RuleInterface $rule,
+        NodeInterface $node,
+        ViolationInterface $violation,
+        ExclusionInterface $exclusion
+    ) {
+        $exclusion->getRequirementExclusions()->willReturn(['dii\blu', 'dii\ble']);
+
+        $rule->getSubject()->willReturn('foo\bar');
+        $rule->getRequirements()->willReturn(['dii\blu', 'dii\ble', 'dii\bla', 'dii\bli']);
+        $rule->getType()->willReturn(RuleInterface::TYPE_FORBIDDEN);
+        $rule->getExclusions()->willReturn([$exclusion]);
+
+        $node->getSubject()->willReturn('foo\bar\baz');
+        $node->getTokens()->willReturn(['dii\blu', 'dii\ble', 'dii\bla', 'dii\bli', 'dii\blo', 'dii\bly']);
+
+        $violation->getNode()->willReturn($node);
+        $violation->getRule()->willReturn($rule);
+        $violation->getType()->willReturn(ViolationInterface::TYPE_ERROR);
+        $violation->getTokenViolations()->willReturn(['dii\bla', 'dii\bli']);
+
+        $this->check($rule, $node)->shouldBeLikeExpectedViolation($violation);
+    }
+
     function it_checks_a_valid_node_with_discouraged_rule(RuleInterface $rule, NodeInterface $node)
     {
         $rule->getSubject()->willReturn('foo\bar');
         $rule->getRequirements()->willReturn(['blu', 'bla', 'bli']);
         $rule->getType()->willReturn(RuleInterface::TYPE_DISCOURAGED);
+        $rule->getExclusions()->willReturn([]);
+
         $node->getSubject()->willReturn('foo\bar\baz');
         $node->getTokens()->willReturn(['blo', 'bly']);
 
@@ -70,6 +101,8 @@ class RuleCheckerSpec extends ObjectBehavior
         $rule->getSubject()->willReturn('foo\bar');
         $rule->getRequirements()->willReturn(['blu', 'bla', 'bli']);
         $rule->getType()->willReturn(RuleInterface::TYPE_DISCOURAGED);
+        $rule->getExclusions()->willReturn([]);
+
         $node->getSubject()->willReturn('foo\bar\baz');
         $node->getTokens()->willReturn(['blu', 'bla', 'blo', 'bly']);
 

@@ -111,6 +111,16 @@ class RuleChecker
      */
     private function checkTokenForForbiddenOrDiscouragedRule(RuleInterface $rule, $token)
     {
+        // filter exclusions
+        foreach ($rule->getExclusions() as $exclusion) {
+            foreach ($exclusion->getRequirementExclusions() as $req) {
+                if (strpos($token, $req) !== false) {
+                    // this token is excluded
+                    return true;
+                }
+            }
+        }
+
         foreach ($rule->getRequirements() as $req) {
             if (strpos($token, $req) !== false) {
                 return false;

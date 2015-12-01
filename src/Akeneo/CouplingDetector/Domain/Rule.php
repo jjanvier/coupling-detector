@@ -14,10 +14,13 @@ class Rule implements RuleInterface
     private $subject;
 
     /** @var array */
-    private $requirements = [];
+    private $requirements;
 
     /** @var string */
     private $type;
+
+    /** @var ExclusionInterface[] */
+    private $exclusions;
 
     /** @var string */
     private $description;
@@ -25,16 +28,18 @@ class Rule implements RuleInterface
     /**
      * Rule constructor.
      *
-     * @param string $subject
-     * @param array  $requirements
-     * @param string $type
-     * @param string $description
+     * @param string               $subject
+     * @param array                $requirements
+     * @param string               $type
+     * @param ExclusionInterface[] $exclusions
+     * @param string               $description
      */
-    public function __construct($subject, array $requirements, $type, $description = null)
+    public function __construct($subject, array $requirements, $type, array $exclusions = [], $description = null)
     {
         $this->requirements = $requirements;
         $this->subject = $subject;
         $this->type = $type;
+        $this->exclusions = $exclusions;
         $this->description = $description;
     }
 
@@ -68,5 +73,13 @@ class Rule implements RuleInterface
     public function getDescription()
     {
         return $this->description;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExclusions()
+    {
+        return $this->exclusions;
     }
 }

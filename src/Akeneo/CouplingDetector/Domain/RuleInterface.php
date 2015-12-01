@@ -33,4 +33,9 @@ interface RuleInterface
      * @return string
      */
     public function getDescription();
+
+    /**
+     * @return ExclusionInterface[]
+     */
+    public function getExclusions();
 }
